@@ -45,7 +45,7 @@ DoubleMLData = R6Class("DoubleMLData",
         private$d_cols_ = d_cols
         if (reset_value) {
           private$check_disjoint_sets()
-          self$set_data_model(self$d_cols[1])
+          self$set_data_model(self$d_cols[1], self$d_cols[2])
         }
       }
     },
@@ -107,13 +107,13 @@ DoubleMLData = R6Class("DoubleMLData",
     #' These variables then are internally added to the covariates `x_cols` during
     #' the fitting stage. If `use_other_treat_as_covariate` is `FALSE`,
     #' `other_treat_cols` is `NULL`.
-    other_treat_cols = function(value) {
-      if (missing(value)) {
-        return(private$other_treat_cols_)
-      } else {
-        stop("can't set field other_treat_cols")
-      }
-    },
+    # other_treat_cols = function(value) {
+    #   if (missing(value)) {
+    #     return(private$other_treat_cols_)
+    #   } else {
+    #     stop("can't set field other_treat_cols")
+    #   }
+    # },
 
     #' @field treat_col (`character(1)`) \cr
     #' "Active" treatment variable in the multiple-treatment case.
@@ -124,6 +124,9 @@ DoubleMLData = R6Class("DoubleMLData",
         stop("can't set field treat_col")
       }
     },
+    
+    # TODO need here to enter also information for the other treatment
+    # variable?
 
     #' @field use_other_treat_as_covariate (`logical(1)`) \cr
     #' Indicates whether in the multiple-treatment case the other treatment
@@ -138,7 +141,7 @@ DoubleMLData = R6Class("DoubleMLData",
         private$use_other_treat_as_covariate_ = use_other_treat_as_covariate
         if (reset_value) {
           private$check_disjoint_sets()
-          self$set_data_model(self$d_cols[1])
+          self$set_data_model(self$d_cols[1], self$d_cols[2])
         }
       }
     },
@@ -172,7 +175,7 @@ DoubleMLData = R6Class("DoubleMLData",
         }
         if (reset_value) {
           private$check_disjoint_sets()
-          self$set_data_model(self$d_cols[1])
+          self$set_data_model(self$d_cols[1], self$d_cols[2])
         }
       }
     },
@@ -190,7 +193,7 @@ DoubleMLData = R6Class("DoubleMLData",
         private$y_col_ = y_col
         if (reset_value) {
           private$check_disjoint_sets()
-          self$set_data_model(self$d_cols[1])
+          self$set_data_model(self$d_cols[1], self$d_cols[2])
         }
       }
     },
@@ -210,7 +213,7 @@ DoubleMLData = R6Class("DoubleMLData",
         private$z_cols_ = z_cols
         if (reset_value) {
           private$check_disjoint_sets()
-          self$set_data_model(self$d_cols[1])
+          self$set_data_model(self$d_cols[1], self$d_cols[2])
         }
       }
     }),
@@ -264,7 +267,7 @@ DoubleMLData = R6Class("DoubleMLData",
       self$use_other_treat_as_covariate = use_other_treat_as_covariate
 
       # by default, we initialize to the first treatment variable
-      self$set_data_model(d_cols[1])
+      self$set_data_model(d_cols[1], d_cols[2])
 
       invisible(self)
     },
@@ -295,21 +298,22 @@ DoubleMLData = R6Class("DoubleMLData",
     #' multiple-treatment case.
     #' @param treatment_var (`character()`)\cr
     #' Active treatment variable that will be set to `treat_col`.
-    set_data_model = function(treatment_var) {
+    set_data_model = function(treatment_var, treatment_var1) {
 
       assert_character(treatment_var, max.len = 1)
       assert_subset(treatment_var, self$d_cols)
 
       private$treat_col_ = treatment_var
+      private$treat_col1_ = treatment_var1
 
-      if (self$n_treat > 1) {
-        if (self$use_other_treat_as_covariate) {
-          private$other_treat_cols_ = self$d_cols[self$d_cols != treatment_var]
-        } else {
-          message("Control variables do not include other treatment variables")
-          private$other_treat_cols_ = NULL
-        }
-      }
+      # if (self$n_treat > 1) {
+      #   if (self$use_other_treat_as_covariate) {
+      #     private$other_treat_cols_ = self$d_cols[self$d_cols != treatment_var]
+      #   } else {
+      #     message("Control variables do not include other treatment variables")
+      #     private$other_treat_cols_ = NULL
+      #   }
+      # }
       col_indx = c(
         self$x_cols, self$y_col, self$treat_col, self$other_treat_cols,
         self$z_cols)
@@ -327,8 +331,9 @@ DoubleMLData = R6Class("DoubleMLData",
     d_cols_ = NULL,
     data_ = NULL,
     data_model_ = NULL,
-    other_treat_cols_ = NULL,
+    # other_treat_cols_ = NULL,
     treat_col_ = NULL,
+    treat_col1_ = NULL,
     use_other_treat_as_covariate_ = NULL,
     x_cols_ = NULL,
     y_col_ = NULL,
@@ -420,7 +425,7 @@ DoubleMLClusterData = R6Class("DoubleMLClusterData",
         private$cluster_cols_ = cluster_cols
         if (reset_value) {
           private$check_disjoint_sets()
-          self$set_data_model(self$d_cols[1])
+          self$set_data_model(self$d_cols[1], self$d_cols[2])
         }
       }
     },
