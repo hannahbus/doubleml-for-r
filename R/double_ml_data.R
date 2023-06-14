@@ -131,20 +131,20 @@ DoubleMLData = R6Class("DoubleMLData",
     #' @field use_other_treat_as_covariate (`logical(1)`) \cr
     #' Indicates whether in the multiple-treatment case the other treatment
     #' variables should be added as covariates. Default is `TRUE`.
-    use_other_treat_as_covariate = function(value) {
-      if (missing(value)) {
-        return(private$use_other_treat_as_covariate_)
-      } else {
-        use_other_treat_as_covariate = value # to get more meaningful assert error messages
-        reset_value = !is.null(self$data_model)
-        assert_logical(use_other_treat_as_covariate, len = 1)
-        private$use_other_treat_as_covariate_ = use_other_treat_as_covariate
-        if (reset_value) {
-          private$check_disjoint_sets()
-          self$set_data_model(self$d_cols[1], self$d_cols[2])
-        }
-      }
-    },
+    # use_other_treat_as_covariate = function(value) {
+    #   if (missing(value)) {
+    #     return(private$use_other_treat_as_covariate_)
+    #   } else {
+    #     use_other_treat_as_covariate = value # to get more meaningful assert error messages
+    #     reset_value = !is.null(self$data_model)
+    #     assert_logical(use_other_treat_as_covariate, len = 1)
+    #     private$use_other_treat_as_covariate_ = use_other_treat_as_covariate
+    #     if (reset_value) {
+    #       private$check_disjoint_sets()
+    #       self$set_data_model(self$d_cols[1], self$d_cols[2])
+    #     }
+    #   }
+    # },
 
     #' @field x_cols (`NULL`, `character()`) \cr
     #' The covariates. If `NULL`, all variables (columns of `data`) which are
@@ -248,7 +248,7 @@ DoubleMLData = R6Class("DoubleMLData",
       y_col = NULL,
       d_cols = NULL,
       z_cols = NULL,
-      use_other_treat_as_covariate = TRUE) {
+      use_other_treat_as_covariate = FALSE) {
 
       if (all(class(data) == "data.frame")) {
         data = data.table(data)
@@ -264,7 +264,7 @@ DoubleMLData = R6Class("DoubleMLData",
       self$x_cols = x_cols
       private$check_disjoint_sets()
 
-      self$use_other_treat_as_covariate = use_other_treat_as_covariate
+      # self$use_other_treat_as_covariate = use_other_treat_as_covariate
 
       # by default, we initialize to the first treatment variable
       self$set_data_model(d_cols[1], d_cols[2])
@@ -656,13 +656,13 @@ double_ml_data_from_data_frame = function(df, x_cols = NULL, y_col = NULL,
     data = DoubleMLData$new(df,
       x_cols = x_cols, y_col = y_col, d_cols = d_cols,
       z_cols = z_cols,
-      use_other_treat_as_covariate = use_other_treat_as_covariate)
+      use_other_treat_as_covariate = FALSE)
   } else {
     data = DoubleMLClusterData$new(df,
       x_cols = x_cols, y_col = y_col,
       d_cols = d_cols, z_cols = z_cols,
       cluster_cols = cluster_cols,
-      use_other_treat_as_covariate = use_other_treat_as_covariate)
+      use_other_treat_as_covariate = FALSE)
   }
   return(data)
 }

@@ -1,5 +1,17 @@
 # Test Script for Multiple Treatments
 
+setwd("~/Documents/Research/climate_risk_beliefs/dml_r/doubleml-for-r/R/")
+
+# Load the package dependencies
+dependencies <- tools::package_dependencies("DoubleML", recursive = TRUE)
+
+# Extract the names of the dependencies
+dependency_names <- unlist(dependencies)
+
+# Load each package using lapply
+for (dep in dependency_names){
+  library(dep, character.only = TRUE)
+}
 
 library(dplyr)
 
@@ -14,7 +26,6 @@ set.seed(123)
 
 # Generate data ----
 n <- 9000  # Number of values to generate
-
 
 # Treatment Assignment
 numbers <- runif(n)
@@ -46,18 +57,6 @@ df %>%
 
 # Do estimation and test if functions as defined work. ----
 
-
-# Load the package dependencies
-dependencies <- tools::package_dependencies("DoubleML", recursive = TRUE)
-
-# Extract the names of the dependencies
-dependency_names <- unlist(dependencies)
-
-# Load each package using lapply
-for (dep in dependency_names){
-  library(dep, character.only = TRUE)
-}
-
 # Transform treatment variable
 
 df <- df %>%
@@ -77,12 +76,12 @@ df_dml <- double_ml_data_from_data_frame(df = df,
 
 ml_l <- lrn("regr.ranger", num.trees = 500, min.node.size = 2,
              max.depth = 5)
-ml_m <- lrn("regr.ranger", num.trees = 500, min.node.size = 2,
+ml_m <- lrn("classif.ranger", num.trees = 500, min.node.size = 2,
              max.depth = 5)
 
 # Instantiate class of IRME
 
-doubleml_irm_manual <- DoubleMLIRME$new(df_dml, ml_l, ml_ml)
+doubleml_irm_manual <- DoubleMLIRME$new(df_dml, ml_l, ml_m)
 
 doubleml_irm_manual$fit()
 doubleml_irm_manual$summary()

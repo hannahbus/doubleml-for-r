@@ -301,9 +301,9 @@ draw_weights = function(method, n_rep_boot, n_obs) {
   return(weights)
 }
 
-get_cond_samples = function(smpls, D) {
+get_cond_samples = function(smpls, D, D1) {
   train_ids_0 = lapply(seq_len(length(smpls$train_ids)), function(x) {
-    smpls$train_ids[[x]][D[smpls$train_ids[[x]]] == 0]
+    smpls$train_ids[[x]][D1[smpls$train_ids[[x]]] == 1]
   })
   train_ids_1 = lapply(seq_len(length(smpls$test_ids)), function(x) {
     smpls$train_ids[[x]][D[smpls$train_ids[[x]]] == 1]

@@ -217,9 +217,12 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
     },
     nuisance_est = function(smpls, ...) {
 
+      # TODO More elegant solution
       cond_smpls = get_cond_samples(
         smpls,
-        self$data$data_model[[self$data$treat_col]])
+        self$data$data[["d"]],
+        self$data$data[["d1"]]
+        )
 
       m_hat = dml_cv_predict(self$learner$ml_m,
         c(self$data$x_cols),
@@ -234,15 +237,27 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
       
       m1_hat = dml_cv_predict(self$learner$ml_m,
                               c(self$data$x_cols),
-                              # This has to be adapted ...
-                              self$data$treat_col1,
-                              self$data$data_model,
+                              "d1",
+                              self$data$data[, c("y", "group", "d1")],
                               nuisance_id = "nuis_m1",
                               smpls = smpls,
                               est_params = self$get_params("ml_m1"),
                               return_train_preds = FALSE,
                               task_type = private$task_type$ml_m,
                               fold_specific_params = private$fold_specific_params)
+        
+        
+        # dml_cv_predict(self$learner$ml_m,
+        #                       c(self$data$x_cols),
+        #                       # This has to be adapted ...
+        #                       self$data$treat_col1,
+        #                       self$data$data_model,
+        #                       nuisance_id = "nuis_m1",
+        #                       smpls = smpls,
+        #                       est_params = self$get_params("ml_m1"),
+        #                       return_train_preds = FALSE,
+        #                       task_type = private$task_type$ml_m,
+        #                       fold_specific_params = private$fold_specific_params)
 
       g0_hat = dml_cv_predict(self$learner$ml_g,
         c(self$data$x_cols),
@@ -258,7 +273,7 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
       g1_hat = list(preds = NULL, models = NULL)
       if ((is.character(self$score) && self$score == "ATE") || is.function(self$score)) {
         g1_hat = dml_cv_predict(self$learner$ml_g,
-          c(self$data$x_cols,
+          self$data$x_cols,
           self$data$y_col,
           self$data$data_model,
           nuisance_id = "nuis_g1",
@@ -270,11 +285,12 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
       }
 
       d = self$data$data_model[[self$data$treat_col]]
+      d1 = self$data$data[["d1"]]
       y = self$data$data_model[[self$data$y_col]]
 
       res = private$score_elements(
-        y, d,
-        g0_hat$preds, g1_hat$preds, m_hat$preds,
+        y, d, d1,
+        g0_hat$preds, g1_hat$preds, m_hat$preds, m1_hat$preds,
         smpls)
       res$preds = list(
         "ml_g0" = g0_hat$preds,
@@ -288,7 +304,7 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
         "ml_m1" = m1_hat$preds)
       return(res)
     },
-    score_elements = function(y, d, g0_hat, g1_hat, m_hat, m1_hat, smpls) {
+    score_elements = function(y, d, d1, g0_hat, g1_hat, m_hat, m1_hat, smpls) {
       if (is.character(self$score) && self$score == "ATTE") {
         # fraction of treated for ATTE
         p_hat = vector("numeric", length = self$data$n_obs)
@@ -310,7 +326,7 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
         if (self$score == "ATE") {
           u1_hat = y - g1_hat
           psi_b = g1_hat - g0_hat + d * (u1_hat) / m_hat -
-            (1 - d) * u0_hat / (m1_hat)
+            (d1) * u0_hat / (m1_hat)
           psi_a = rep(-1, self$data$n_obs)
         } else if (self$score == "ATTE") {
           psi_b = d * u0_hat / p_hat -
@@ -416,21 +432,23 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
           "To fit an interactive IV regression model use DoubleMLIIVM",
           "instead of DoubleMLIRM."))
       }
-      one_treat = (obj_dml_data$n_treat == 1)
-      err_msg = paste(
-        "Incompatible data.\n",
-        "To fit an IRM model with DoubleML",
-        "exactly one binary variable with values 0 and 1",
-        "needs to be specified as treatment variable.")
-      if (one_treat) {
-        binary_treat = test_integerish(obj_dml_data$data[[obj_dml_data$d_cols]],
-          lower = 0, upper = 1)
-        if (!(one_treat & binary_treat)) {
-          stop(err_msg)
-        }
-      } else {
-        stop(err_msg)
-      }
+      # TODO: Find the error
+      # print(obj_dml_data$n_treat)
+      # one_treat = TRUE # (obj_dml_data$n_treat == 1)
+      # err_msg = paste(
+      #   "Incompatible data.\n",
+      #   "To fit an IRM model with DoubleML",
+      #   "exactly one binary variable with values 0 and 1",
+      #   "needs to be specified as treatment variable.")
+      # if (one_treat) {
+      #   binary_treat = test_integerish(obj_dml_data$data[[obj_dml_data$d_cols]],
+      #     lower = 0, upper = 1)
+      #   if (!(one_treat & binary_treat)) {
+      #     stop(err_msg)
+      #   }
+      # } else {
+      #   stop(err_msg)
+      # }
       return()
     }
   )

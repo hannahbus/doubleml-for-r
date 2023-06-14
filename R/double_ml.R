@@ -389,12 +389,13 @@ DoubleML = R6Class("DoubleML",
       # TODO: insert check for tuned params
       for (i_rep in 1:self$n_rep) {
         private$i_rep = i_rep
-
-        for (i_treat in 1:self$data$n_treat) {
+        # TODO Adapt this
+        for (i_treat in 1:1) {
           private$i_treat = i_treat
 
           if (self$data$n_treat > 1) {
-            self$data$set_data_model(self$data$d_cols[i_treat])
+            self$data$set_data_model(self$data$d_cols[i_treat],
+                                     self$data$d_cols[i_treat + 1])
           }
 
           # ml estimation of nuisance models and computation of psi elements
