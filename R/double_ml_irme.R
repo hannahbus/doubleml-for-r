@@ -235,10 +235,12 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
         task_type = private$task_type$ml_m,
         fold_specific_params = private$fold_specific_params)
       
+      
+      helper <- c("y", "d1", c(self$data$x_cols))
       m1_hat = dml_cv_predict(self$learner$ml_m,
                               c(self$data$x_cols),
                               "d1",
-                              self$data$data[, c("y", "group", "d1")],
+                              self$data$data[, ..helper, with=FALSE],
                               nuisance_id = "nuis_m1",
                               smpls = smpls,
                               est_params = self$get_params("ml_m1"),
@@ -246,19 +248,7 @@ DoubleMLIRME = R6Class("DoubleMLIRME",
                               task_type = private$task_type$ml_m,
                               fold_specific_params = private$fold_specific_params)
         
-        
-        # dml_cv_predict(self$learner$ml_m,
-        #                       c(self$data$x_cols),
-        #                       # This has to be adapted ...
-        #                       self$data$treat_col1,
-        #                       self$data$data_model,
-        #                       nuisance_id = "nuis_m1",
-        #                       smpls = smpls,
-        #                       est_params = self$get_params("ml_m1"),
-        #                       return_train_preds = FALSE,
-        #                       task_type = private$task_type$ml_m,
-        #                       fold_specific_params = private$fold_specific_params)
-
+      
       g0_hat = dml_cv_predict(self$learner$ml_g,
         c(self$data$x_cols),
         self$data$y_col,

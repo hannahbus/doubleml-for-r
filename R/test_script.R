@@ -67,6 +67,10 @@ df <- df %>%
 
 # Declare DML data.frame
 
+df <- df %>%
+  rename(d3 = d1,
+         d1 = d0)
+
 df_dml <- double_ml_data_from_data_frame(df = df,
                                y = "y",
                                d = c("d", "d1"),
