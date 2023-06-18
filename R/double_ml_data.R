@@ -315,7 +315,8 @@ DoubleMLData = R6Class("DoubleMLData",
       #   }
       # }
       col_indx = c(
-        self$x_cols, self$y_col, self$treat_col, self$other_treat_cols,
+        self$x_cols, self$y_col, self$treat_col, self$treat_col1,
+        self$other_treat_cols,
         self$z_cols)
       private$data_model_ = self$data[, col_indx, with = FALSE]
       stopifnot(nrow(self$data) == nrow(self$data_model))
@@ -553,13 +554,13 @@ DoubleMLClusterData = R6Class("DoubleMLClusterData",
     #' multiple-treatment case.
     #' @param treatment_var (`character()`)\cr
     #' Active treatment variable that will be set to `treat_col`.
-    set_data_model = function(treatment_var) {
-      super$set_data_model(treatment_var)
+    set_data_model = function(treatment_var, treatment_var1) {
+      super$set_data_model(treatment_var, treatment_var1)
 
       # add the cluster_cols to the data_model_
       col_indx = c(
-        self$x_cols, self$y_col, self$treat_col, self$other_treat_cols,
-        self$z_cols, self$cluster_cols)
+        self$x_cols, self$y_col, self$treat_col, self$treat_col1,
+        self$other_treat_cols, self$z_cols, self$cluster_cols)
       private$data_model_ = self$data[, col_indx, with = FALSE]
       stopifnot(nrow(self$data) == nrow(self$data_model))
 
